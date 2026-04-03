@@ -217,30 +217,37 @@
 </div>
 
 <script>
-  const DOSES = [
-    { label: "2. Doz", badge: "2.\nDoz", type: "weeks", amount: 4 },
-    { label: "3. Doz", badge: "3.\nDoz", type: "months", amount: 3 },
-    { label: "4. Doz", badge: "4.\nDoz", type: "months", amount: 6 }
-  ];
-
   function formatTR(d) {
     return d.toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" });
   }
 
-  function calcDate(base, type, amount) {
-    const d = new Date(base);
-    if (type === "weeks") d.setDate(d.getDate() + amount * 7);
-    else d.setMonth(d.getMonth() + amount);
+  function addDays(date, n) {
+    const d = new Date(date);
+    d.setDate(d.getDate() + n);
+    return d;
+  }
+
+  function addMonths(date, n) {
+    const d = new Date(date);
+    d.setMonth(d.getMonth() + n);
     return d;
   }
 
   function pad(n) { return String(n).padStart(2, "0"); }
   function toICSDate(d) { return d.getFullYear() + pad(d.getMonth()+1) + pad(d.getDate()); }
 
-  const now = new Date();
-  document.getElementById("startDate").textContent = formatTR(now);
+  const dose1 = new Date();
+  const dose2 = addDays(dose1, 28);
+  const dose3 = addMonths(dose2, 3);
+  const dose4 = addMonths(dose3, 3);
 
-  const computed = DOSES.map(d => ({ ...d, date: calcDate(now, d.type, d.amount) }));
+  document.getElementById("startDate").textContent = formatTR(dose1);
+
+  const computed = [
+    { label: "2. Doz", badge: "2.\nDoz", date: dose2 },
+    { label: "3. Doz", badge: "3.\nDoz", date: dose3 },
+    { label: "4. Doz", badge: "4.\nDoz", date: dose4 }
+  ];
 
   const list = document.getElementById("reminderList");
   computed.forEach((r, idx) => {
