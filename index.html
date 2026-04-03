@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Tedavi Takip — Hatırlatıcı Ekle</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --green-deep: #0a4a3a;
+    --green-mid:  #12735c;
+    --green-soft: #e6f4f0;
+    --green-pale: #f2faf7;
+    --text:       #1a1a1a;
+    --muted:      #6b7b76;
+    --border:     #d4e5e0;
+    --white:      #ffffff;
+    --radius:     14px;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--green-pale);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 420px;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    margin-bottom: 2rem;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .logo-mark {
+    width: 56px;
+    height: 56px;
+    background: var(--green-deep);
+    border-radius: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+  }
+
+  .logo-mark svg { display: block; }
+
+  .header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.75rem;
+    font-weight: 400;
+    color: var(--green-deep);
+    line-height: 1.2;
+    margin-bottom: 0.4rem;
+  }
+
+  .header p {
+    font-size: 0.875rem;
+    color: var(--muted);
+    font-weight: 300;
+  }
+
+  /* Card */
+  .card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    animation: fadeUp 0.5s 0.1s ease both;
+  }
+
+  .card-section {
+    padding: 1.25rem 1.5rem;
+  }
+
+  .card-section + .card-section {
+    border-top: 1px solid var(--border);
+  }
+
+  /* Start date */
+  .start-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.35rem;
+  }
+
+  .start-date {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.5rem;
+    color: var(--green-deep);
+  }
+
+  /* Reminder rows */
+  .reminder-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--green-soft);
+    animation: fadeUp 0.4s ease both;
+  }
+
+  .reminder-row:last-child { border-bottom: none; }
+
+  .badge {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: var(--green-soft);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: var(--green-mid);
+    line-height: 1.1;
+    text-align: center;
+  }
+
+  .reminder-info { flex: 1; }
+
+  .reminder-name {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .reminder-date {
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-top: 1px;
+  }
+
+  .check {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  /* Button */
+  .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 14px;
+    background: var(--green-deep);
+    color: var(--white);
+    border: none;
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+  }
+
+  .btn:hover { background: var(--green-mid); }
+  .btn:active { transform: scale(0.98); }
+
+  .btn.success {
+    background: #0a4a3a;
+  }
+
+  /* Note */
+  .note {
+    text-align: center;
+    margin-top: 1.25rem;
+    font-size: 0.75rem;
+    color: var(--muted);
+    line-height: 1.6;
+    animation: fadeUp 0.5s 0.2s ease both;
+  }
+
+  .note span {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  /* Animations */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <div class="header">
+    <div class="logo-mark">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <rect x="4" y="6" width="20" height="18" rx="3" stroke="white" stroke-width="1.8"/>
+        <line x1="9" y1="4" x2="9" y2="9" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="19" y1="4" x2="19" y2="9" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="4" y1="12" x2="24" y2="12" stroke="white" stroke-width="1.4"/>
+        <line x1="14" y1="17" x2="14" y2="22" stroke="white" stroke-width="1.6" stroke-linecap="round"/>
+        <line x1="11" y1="19.5" x2="17" y2="19.5" stroke="white" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <h1>Tedavi Takibiniz</h1>
+    <p>Hatırlatıcıları tek dokunuşla takviminize ekleyin</p>
+  </div>
+
+  <div class="card">
+    <div class="card-section">
+      <p class="start-label">Başlangıç tarihi</p>
+      <p class="start-date" id="startDate">—</p>
+    </div>
+
+    <div class="card-section">
+      <div id="reminderList"></div>
+    </div>
+
+    <div class="card-section">
+      <button class="btn" id="downloadBtn" onclick="downloadICS()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        Takvime Ekle
+      </button>
+    </div>
+  </div>
+
+  <p class="note">
+    <span>
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      iPhone ve Android takvim uygulamalarıyla uyumludur.
+    </span>
+    <br/>
+    İndirilen dosyayı açarak hatırlatıcıları onaylayın.
+  </p>
+
+</div>
+
+<script>
+  const MONTHS = [3, 6, 9, 12];
+  const LABELS = ["1. Kontrol", "2. Kontrol", "3. Kontrol", "4. Kontrol"];
+
+  function formatTR(d) {
+    return d.toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" });
+  }
+
+  function addMonths(date, n) {
+    const d = new Date(date);
+    d.setMonth(d.getMonth() + n);
+    return d;
+  }
+
+  function pad(n) { return String(n).padStart(2, "0"); }
+
+  function toICSDate(d) {
+    return d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate());
+  }
+
+  const now = new Date();
+  document.getElementById("startDate").textContent = formatTR(now);
+
+  const reminders = MONTHS.map((m, i) => ({
+    label: LABELS[i],
+    month: m,
+    date: addMonths(now, m)
+  }));
+
+  const list = document.getElementById("reminderList");
+  reminders.forEach((r, idx) => {
+    const row = document.createElement("div");
+    row.className = "reminder-row";
+    row.style.animationDelay = (0.15 + idx * 0.07) + "s";
+    row.innerHTML = `
+      <div class="badge">${r.month}<br>ay</div>
+      <div class="reminder-info">
+        <div class="reminder-name">${r.label}</div>
+        <div class="reminder-date">${formatTR(r.date)}</div>
+      </div>
+      <div class="check"></div>
+    `;
+    list.appendChild(row);
+  });
+
+  function downloadICS() {
+    let ics = "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//TedaviTakip//TR\r\nCALSCALE:GREGORIAN\r\n";
+
+    reminders.forEach((r, i) => {
+      const uid = "tedavi-kontrol-" + i + "-" + Date.now() + "@tedavitakip";
+      const dtstart = toICSDate(r.date);
+      ics += "BEGIN:VEVENT\r\n";
+      ics += "UID:" + uid + "\r\n";
+      ics += "DTSTART;VALUE=DATE:" + dtstart + "\r\n";
+      ics += "DTEND;VALUE=DATE:" + dtstart + "\r\n";
+      ics += "SUMMARY:Tedavi Kontrolü — " + r.label + "\r\n";
+      ics += "DESCRIPTION:Lütfen kliniğinize başvurunuz.\r\n";
+      ics += "BEGIN:VALARM\r\nTRIGGER:-P1D\r\nACTION:DISPLAY\r\nDESCRIPTION:Yarın tedavi kontrolünüz var!\r\nEND:VALARM\r\n";
+      ics += "END:VEVENT\r\n";
+    });
+
+    ics += "END:VCALENDAR";
+
+    const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "tedavi-takvim.ics";
+    a.click();
+    URL.revokeObjectURL(url);
+
+    const btn = document.getElementById("downloadBtn");
+    btn.classList.add("success");
+    btn.innerHTML = `
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+      İndirildi — Takvim uygulamasından aç
+    `;
+  }
+</script>
+</body>
+</html>
