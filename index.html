@@ -34,7 +34,6 @@
 
   .container { width: 100%; max-width: 440px; }
 
-  /* Header */
   .header {
     text-align: center;
     margin-bottom: 1.75rem;
@@ -58,10 +57,8 @@
     font-weight: 400;
     color: var(--green-deep);
     line-height: 1.2;
-    margin-bottom: 0.5rem;
   }
 
-  /* Onboarding banner */
   .onboarding {
     background: var(--green-deep);
     border-radius: var(--radius);
@@ -73,12 +70,6 @@
     animation: fadeUp 0.5s 0.05s ease both;
   }
 
-  .onboarding-icon {
-    font-size: 22px;
-    flex-shrink: 0;
-    margin-top: 1px;
-  }
-
   .onboarding p {
     font-size: 1rem;
     color: #ffffff;
@@ -86,14 +77,65 @@
     font-weight: 400;
   }
 
-  /* Card */
+  /* Hasta tipi seçimi */
+  .patient-select {
+    margin-bottom: 1rem;
+    animation: fadeUp 0.5s 0.08s ease both;
+  }
+
+  .select-label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.6rem;
+    display: block;
+  }
+
+  .patient-btns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .patient-btn {
+    padding: 16px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--white);
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+  }
+
+  .patient-btn:hover { border-color: var(--green-mid); background: var(--green-soft); }
+  .patient-btn.selected { border-color: var(--green-deep); background: var(--green-soft); }
+
+  .patient-btn-title {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .patient-btn-sub {
+    font-size: 0.75rem;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+
+  /* Takvim kartı */
   .card {
+    display: none;
     background: var(--white);
     border: 1px solid var(--border);
     border-radius: var(--radius);
     overflow: hidden;
-    animation: fadeUp 0.5s 0.1s ease both;
+    animation: fadeUp 0.4s ease both;
   }
+
+  .card.visible { display: block; }
 
   .card-section { padding: 1.25rem 1.5rem; }
   .card-section + .card-section { border-top: 1px solid var(--border); }
@@ -113,14 +155,12 @@
     color: var(--green-deep);
   }
 
-  /* Dose rows */
   .reminder-row {
     display: flex;
     align-items: center;
     gap: 14px;
     padding: 0.85rem 0;
     border-bottom: 1px solid var(--green-soft);
-    animation: fadeUp 0.4s ease both;
   }
 
   .reminder-row:last-child { border-bottom: none; }
@@ -139,23 +179,13 @@
     color: var(--green-mid);
     line-height: 1.2;
     text-align: center;
+    white-space: pre-line;
   }
 
   .reminder-info { flex: 1; }
+  .reminder-name { font-size: 1rem; font-weight: 500; color: var(--text); }
+  .reminder-date { font-size: 0.875rem; color: var(--muted); margin-top: 2px; }
 
-  .reminder-name {
-    font-size: 1rem;
-    font-weight: 500;
-    color: var(--text);
-  }
-
-  .reminder-date {
-    font-size: 0.875rem;
-    color: var(--muted);
-    margin-top: 2px;
-  }
-
-  /* Button */
   .btn {
     display: flex;
     align-items: center;
@@ -178,7 +208,7 @@
   .btn:active { transform: scale(0.98); }
   .btn.success { background: #085041; pointer-events: none; }
 
-  /* Post-download guidance */
+  /* Guidance */
   .guidance {
     display: none;
     margin-top: 1rem;
@@ -197,9 +227,6 @@
     font-size: 0.85rem;
     font-weight: 500;
     color: var(--green-deep);
-    display: flex;
-    align-items: center;
-    gap: 8px;
   }
 
   .guidance-step {
@@ -225,20 +252,14 @@
     margin-top: 1px;
   }
 
-  .step-text {
-    font-size: 0.95rem;
-    color: var(--text);
-    line-height: 1.5;
-  }
+  .step-text { font-size: 0.95rem; color: var(--text); line-height: 1.5; }
 
-  /* Note */
   .note {
     text-align: center;
     margin-top: 1.25rem;
     font-size: 0.8rem;
     color: var(--muted);
     line-height: 1.6;
-    animation: fadeUp 0.5s 0.2s ease both;
   }
 
   @keyframes fadeUp {
@@ -264,22 +285,33 @@
     <h1>Tedavi Takibiniz</h1>
   </div>
 
-  <!-- Onboarding -->
   <div class="onboarding">
-    <div class="onboarding-icon">📅</div>
-    <p>Tedavi takviminiz hazırlandı. Hatırlatıcıları telefonunuza eklemek için aşağıdaki butona dokunun.</p>
+    <div style="font-size:22px;flex-shrink:0;margin-top:1px;">📅</div>
+    <p>Tedavi takviminizi oluşturmak için lütfen hasta tipinizi seçin.</p>
   </div>
 
-  <div class="card">
+  <div class="patient-select">
+    <span class="select-label">Hasta tipiniz</span>
+    <div class="patient-btns">
+      <div class="patient-btn" id="btn-naive" onclick="selectPatient('naive')">
+        <div class="patient-btn-title">Naif Hasta</div>
+        <div class="patient-btn-sub">Tedaviye bugün ilk kez başlıyorum</div>
+      </div>
+      <div class="patient-btn" id="btn-continuing" onclick="selectPatient('continuing')">
+        <div class="patient-btn-title">Devamlı Hasta</div>
+        <div class="patient-btn-sub">Tedavim daha önce başladı, bugün doz aldım</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" id="card">
     <div class="card-section">
-      <p class="start-label">1. Doz — Başlangıç tarihi</p>
+      <p class="start-label" id="startLabel">—</p>
       <p class="start-date" id="startDate">—</p>
     </div>
-
     <div class="card-section">
       <div id="reminderList"></div>
     </div>
-
     <div class="card-section">
       <button class="btn" id="downloadBtn" onclick="downloadICS()">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -292,11 +324,8 @@
     </div>
   </div>
 
-  <!-- Post-download guidance -->
   <div class="guidance" id="guidance">
-    <div class="guidance-header">
-      ✅ Şimdi ne yapmalısınız?
-    </div>
+    <div class="guidance-header">✅ Şimdi ne yapmalısınız?</div>
     <div id="guidanceSteps"></div>
   </div>
 
@@ -305,13 +334,11 @@
 </div>
 
 <script>
-  function isIOS() {
-    return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-  }
+  let computed = [];
+  let patientType = null;
 
-  function isAndroid() {
-    return /Android/.test(navigator.userAgent);
-  }
+  function isIOS() { return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream; }
+  function isAndroid() { return /Android/.test(navigator.userAgent); }
 
   function formatTR(d) {
     return d.toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" });
@@ -332,94 +359,101 @@
   function pad(n) { return String(n).padStart(2, "0"); }
   function toICSDate(d) { return d.getFullYear() + pad(d.getMonth()+1) + pad(d.getDate()); }
 
-  const dose1 = new Date();
-  const dose2 = addDays(dose1, 28);
-  const dose3 = addMonths(dose2, 3);
-  const dose4 = addMonths(dose3, 3);
+  function selectPatient(type) {
+    patientType = type;
 
-  document.getElementById("startDate").textContent = formatTR(dose1);
+    document.getElementById("btn-naive").classList.toggle("selected", type === "naive");
+    document.getElementById("btn-continuing").classList.toggle("selected", type === "continuing");
 
-  const computed = [
-    { label: "2. Doz", badge: "2.\nDoz", date: dose2 },
-    { label: "3. Doz", badge: "3.\nDoz", date: dose3 },
-    { label: "4. Doz", badge: "4.\nDoz", date: dose4 }
-  ];
+    const today = new Date();
+    computed = [];
 
-  const list = document.getElementById("reminderList");
-  computed.forEach((r, idx) => {
-    const row = document.createElement("div");
-    row.className = "reminder-row";
-    row.style.animationDelay = (0.15 + idx * 0.07) + "s";
-    row.innerHTML = `
-      <div class="badge" style="white-space:pre-line">${r.badge}</div>
-      <div class="reminder-info">
-        <div class="reminder-name">${r.label}</div>
-        <div class="reminder-date">${formatTR(r.date)}</div>
-      </div>
-    `;
-    list.appendChild(row);
-  });
+    if (type === "naive") {
+      // Naif: 1.doz bugün, 2.doz 28 gün sonra, 3.doz 2.dozdan 3 ay, 4.doz 3.dozdan 3 ay
+      const dose2 = addDays(today, 28);
+      const dose3 = addMonths(dose2, 3);
+      const dose4 = addMonths(dose3, 3);
+      computed = [
+        { label: "2. Doz", badge: "2.\nDoz", date: dose2 },
+        { label: "3. Doz", badge: "3.\nDoz", date: dose3 },
+        { label: "4. Doz", badge: "4.\nDoz", date: dose4 },
+      ];
+      document.getElementById("startLabel").textContent = "1. Doz — Başlangıç tarihi";
+    } else {
+      // Devamlı: bugün son doz, sonraki doz 3 ay sonra
+      const nextDose = addMonths(today, 3);
+      computed = [
+        { label: "Sonraki Doz", badge: "Sonr.\nDoz", date: nextDose },
+      ];
+      document.getElementById("startLabel").textContent = "Bugünkü Doz tarihi";
+    }
 
-  const iosSteps = [
-    "İndirilen dosya otomatik açılacak.",
-    "Ekrana gelen pencerede tarihleri kontrol edin.",
-    "\"Tümünü Ekle\" veya \"Ekle\" butonuna dokunun.",
-    "Takvim uygulamanızı açarak hatırlatıcıları görebilirsiniz."
-  ];
+    document.getElementById("startDate").textContent = formatTR(today);
 
-  const androidSteps = [
-    "Telefonunuzun üst kısmından bildirimleri aşağı çekin.",
-    "İndirilen \"tedavi-takvim.ics\" dosyasına dokunun.",
-    "\"Google Takvim ile aç\" seçeneğini seçin.",
-    "\"Takvime Ekle\" butonuna dokunun."
-  ];
-
-  const genericSteps = [
-    "Telefonunuzun indirilenler klasörünü açın.",
-    "\"tedavi-takvim.ics\" dosyasına dokunun.",
-    "Takvim uygulamanızla açmayı seçin.",
-    "Hatırlatıcıları onaylayın."
-  ];
-
-  function getSteps() {
-    if (isIOS()) return iosSteps;
-    if (isAndroid()) return androidSteps;
-    return genericSteps;
-  }
-
-  function showGuidance() {
-    const guidance = document.getElementById("guidance");
-    const stepsContainer = document.getElementById("guidanceSteps");
-    const steps = getSteps();
-
-    stepsContainer.innerHTML = "";
-    steps.forEach((text, i) => {
-      const div = document.createElement("div");
-      div.className = "guidance-step";
-      div.innerHTML = `
-        <div class="step-num">${i + 1}</div>
-        <div class="step-text">${text}</div>
+    const list = document.getElementById("reminderList");
+    list.innerHTML = "";
+    computed.forEach((r) => {
+      const row = document.createElement("div");
+      row.className = "reminder-row";
+      row.innerHTML = `
+        <div class="badge">${r.badge}</div>
+        <div class="reminder-info">
+          <div class="reminder-name">${r.label}</div>
+          <div class="reminder-date">${formatTR(r.date)}</div>
+        </div>
       `;
-      stepsContainer.appendChild(div);
+      list.appendChild(row);
     });
 
-    guidance.classList.add("visible");
-    guidance.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    // Reset button and guidance
+    const btn = document.getElementById("downloadBtn");
+    btn.className = "btn";
+    btn.innerHTML = `
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="7 10 12 15 17 10"/>
+        <line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+      Hatırlatıcıları Telefonuma Ekle
+    `;
+    document.getElementById("guidance").classList.remove("visible");
+    document.getElementById("card").classList.add("visible");
+    document.getElementById("card").scrollIntoView({ behavior: "smooth", block: "nearest" });
   }
 
   function downloadICS() {
     let ics = "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//TedaviTakip//TR\r\nCALSCALE:GREGORIAN\r\n";
 
     computed.forEach((r, i) => {
-      const uid = "tedavi-doz-" + (i+2) + "-" + Date.now() + "@tedavitakip";
-      const dtstart = toICSDate(r.date);
+      // Her doz için 5,4,3,2,1 gün öncesi bildirim
+      for (let daysLeft = 5; daysLeft >= 1; daysLeft--) {
+        const uid = "tedavi-" + i + "-" + daysLeft + "d-" + Date.now() + "@tedavitakip";
+        const alertDate = addDays(r.date, -daysLeft);
+        const dtstart = toICSDate(alertDate);
+        const msg = daysLeft === 1
+          ? r.label + " için yarın kliniğinize başvurunuz!"
+          : r.label + " için " + daysLeft + " gün kaldı, ihmal etmeyin!";
+
+        ics += "BEGIN:VEVENT\r\n";
+        ics += "UID:" + uid + "\r\n";
+        ics += "DTSTART;VALUE=DATE:" + dtstart + "\r\n";
+        ics += "DTEND;VALUE=DATE:" + dtstart + "\r\n";
+        ics += "SUMMARY:" + (daysLeft === 1 ? "⚠️ Yarın " : "📅 " + daysLeft + " Gün Kaldı — ") + r.label + "\r\n";
+        ics += "DESCRIPTION:" + msg + "\r\n";
+        ics += "BEGIN:VALARM\r\nTRIGGER:-PT0S\r\nACTION:DISPLAY\r\nDESCRIPTION:" + msg + "\r\nEND:VALARM\r\n";
+        ics += "END:VEVENT\r\n";
+      }
+
+      // Doz günü etkinliği
+      const doseUid = "tedavi-dose-" + i + "-" + Date.now() + "@tedavitakip";
+      const doseDt = toICSDate(r.date);
       ics += "BEGIN:VEVENT\r\n";
-      ics += "UID:" + uid + "\r\n";
-      ics += "DTSTART;VALUE=DATE:" + dtstart + "\r\n";
-      ics += "DTEND;VALUE=DATE:" + dtstart + "\r\n";
-      ics += "SUMMARY:Tedavi — " + r.label + "\r\n";
-      ics += "DESCRIPTION:Lütfen kliniğinize başvurunuz.\r\n";
-      ics += "BEGIN:VALARM\r\nTRIGGER:-P2D\r\nACTION:DISPLAY\r\nDESCRIPTION:" + r.label + " için 2 gün kaldı!\r\nEND:VALARM\r\n";
+      ics += "UID:" + doseUid + "\r\n";
+      ics += "DTSTART;VALUE=DATE:" + doseDt + "\r\n";
+      ics += "DTEND;VALUE=DATE:" + doseDt + "\r\n";
+      ics += "SUMMARY:💉 " + r.label + " — Klinik Randevusu\r\n";
+      ics += "DESCRIPTION:Bugün " + r.label + " günüdür. Lütfen kliniğinize başvurunuz.\r\n";
+      ics += "BEGIN:VALARM\r\nTRIGGER:-PT0S\r\nACTION:DISPLAY\r\nDESCRIPTION:Bugün " + r.label + " günüdür!\r\nEND:VALARM\r\n";
       ics += "END:VEVENT\r\n";
     });
 
@@ -441,11 +475,46 @@
       </svg>
       Hatırlatıcılar İndirildi
     `;
-
     showGuidance();
   }
 
-  // Warn user before leaving page if they haven't downloaded yet
+  function showGuidance() {
+    const iosSteps = [
+      "İndirilen dosya otomatik açılacak.",
+      "Ekrana gelen pencerede tarihleri kontrol edin.",
+      "\"Tümünü Ekle\" veya \"Ekle\" butonuna dokunun.",
+      "Takvim uygulamanızı açarak hatırlatıcıları görebilirsiniz."
+    ];
+
+    const androidSteps = [
+      "Telefonunuzun üst kısmından bildirimleri aşağı çekin.",
+      "İndirilen \"tedavi-takvim.ics\" dosyasına dokunun.",
+      "\"Google Takvim ile aç\" seçeneğini seçin.",
+      "\"Takvime Ekle\" butonuna dokunun."
+    ];
+
+    const genericSteps = [
+      "Telefonunuzun indirilenler klasörünü açın.",
+      "\"tedavi-takvim.ics\" dosyasına dokunun.",
+      "Takvim uygulamanızla açmayı seçin.",
+      "Hatırlatıcıları onaylayın."
+    ];
+
+    const steps = isIOS() ? iosSteps : isAndroid() ? androidSteps : genericSteps;
+    const stepsContainer = document.getElementById("guidanceSteps");
+    stepsContainer.innerHTML = "";
+    steps.forEach((text, i) => {
+      const div = document.createElement("div");
+      div.className = "guidance-step";
+      div.innerHTML = `<div class="step-num">${i+1}</div><div class="step-text">${text}</div>`;
+      stepsContainer.appendChild(div);
+    });
+
+    const guidance = document.getElementById("guidance");
+    guidance.classList.add("visible");
+    guidance.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
   window.addEventListener("beforeunload", function(e) {
     const btn = document.getElementById("downloadBtn");
     if (!btn.classList.contains("success")) {
