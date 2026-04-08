@@ -353,24 +353,7 @@
   }
 
   function pad(n) { return String(n).padStart(2, "0"); }
-
-  function toICSDateTime(d) {
-    // Sabah 09:00 olarak ayarla ki bildirimler gün başında gelsin
-    return d.getFullYear() + pad(d.getMonth()+1) + pad(d.getDate()) + "T090000";
-  }
-
-  function toICSDate(d) {
-    return d.getFullYear() + pad(d.getMonth()+1) + pad(d.getDate());
-  }
-
-  // Kaç gün kala alarm satırı üretir
-  function alarmBlock(daysLeft, label) {
-    const minutes = daysLeft * 24 * 60; // gün → dakika
-    const msg = daysLeft === 1
-      ? label + " için yarın kliniğinize başvurunuz!"
-      : label + " için " + daysLeft + " gün kaldı, ihmal etmeyin!";
-    return "BEGIN:VALARM\r\nTRIGGER:-P" + daysLeft + "D\r\nACTION:DISPLAY\r\nDESCRIPTION:" + msg + "\r\nEND:VALARM\r\n";
-  }
+  function toICSDate(d) { return d.getFullYear() + pad(d.getMonth()+1) + pad(d.getDate()); }
 
   function selectPatient(type) {
     document.getElementById("btn-naive").classList.toggle("selected", type === "naive");
@@ -392,7 +375,7 @@
     } else {
       const nextDose = addMonths(today, 3);
       computed = [
-        { label: "Sonraki Doz", badge: "Sonr.\nDoz", date: nextDose },
+        { label: "Sonraki Dozunuz", badge: "Sonr.\nDoz", date: nextDose },
       ];
       document.getElementById("startLabel").textContent = "Bugünkü Doz tarihi";
     }
@@ -433,21 +416,39 @@
     let ics = "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//TedaviTakip//TR\r\nCALSCALE:GREGORIAN\r\n";
 
     computed.forEach((r, i) => {
-      const uid = "tedavi-doz-" + i + "-" + Date.now() + "@tedavitakip";
-      const dtstart = toICSDate(r.date);
+      // 5 günlük geri sayım etkinlikleri — her gün ayrı etkinlik olarak takvimde görünür
+      for (let daysLeft = 5; daysLeft >= 1; daysLeft--) {
+        const alertDate = addDays(r.date, -daysLeft);
+        const uid = "tedavi-" + i + "-countdown-" + daysLeft + "-" + Date.now() + "@tedavitakip";
+        const dtstart = toICSDate(alertDate);
+        const title = daysLeft === 1
+          ? "⚠️ Yarın " + r.label + " — Kliniğinizi arayın!"
+          : "📅 " + r.label + " için " + daysLeft + " gün kaldı";
+        const desc = daysLeft === 1
+          ? r.label + " için yarın kliniğinize başvurunuz, ihmal etmeyin!"
+          : r.label + " için " + daysLeft + " gün kaldı, ihmal etmeyin!";
 
-      ics += "BEGIN:VEVENT\r\n";
-      ics += "UID:" + uid + "\r\n";
-      ics += "DTSTART;VALUE=DATE:" + dtstart + "\r\n";
-      ics += "DTEND;VALUE=DATE:" + dtstart + "\r\n";
-      ics += "SUMMARY:💉 " + r.label + " — Klinik Randevusu\r\n";
-      ics += "DESCRIPTION:Bugün " + r.label + " günüdür. Lütfen kliniğinize başvurunuz.\r\n";
-
-      // Tek etkinliğe 5 alarm göm
-      for (let d = 5; d >= 1; d--) {
-        ics += alarmBlock(d, r.label);
+        ics += "BEGIN:VEVENT\r\n";
+        ics += "UID:" + uid + "\r\n";
+        ics += "DTSTART;VALUE=DATE:" + dtstart + "\r\n";
+        ics += "DTEND;VALUE=DATE:" + dtstart + "\r\n";
+        ics += "SUMMARY:" + title + "\r\n";
+        ics += "DESCRIPTION:" + desc + "\r\n";
+        ics += "BEGIN:VALARM\r\nTRIGGER:-PT0S\r\nACTION:DISPLAY\r\nDESCRIPTION:" + desc + "\r\nEND:VALARM\r\n";
+        ics += "END:VEVENT\r\n";
       }
 
+      // Doz günü etkinliği
+      const doseUid = "tedavi-" + i + "-doseday-" + Date.now() + "@tedavitakip";
+      const doseDt = toICSDate(r.date);
+      const doseDesc = "Bugün " + r.label + " günüdür. Lütfen kliniğinize başvurunuz.";
+      ics += "BEGIN:VEVENT\r\n";
+      ics += "UID:" + doseUid + "\r\n";
+      ics += "DTSTART;VALUE=DATE:" + doseDt + "\r\n";
+      ics += "DTEND;VALUE=DATE:" + doseDt + "\r\n";
+      ics += "SUMMARY:💉 " + r.label + " — Klinik Randevusu\r\n";
+      ics += "DESCRIPTION:" + doseDesc + "\r\n";
+      ics += "BEGIN:VALARM\r\nTRIGGER:-PT0S\r\nACTION:DISPLAY\r\nDESCRIPTION:" + doseDesc + "\r\nEND:VALARM\r\n";
       ics += "END:VEVENT\r\n";
     });
 
@@ -475,8 +476,7 @@
   function showGuidance() {
     const iosSteps = [
       "İndirilen dosya otomatik açılacak.",
-      "Ekrana gelen pencerede tarihleri kontrol edin.",
-      "\"Tümünü Ekle\" veya \"Ekle\" butonuna dokunun.",
+      "Ekrana gelen pencerede \"Tümünü Ekle\" butonuna dokunun.",
       "Takvim uygulamanızı açarak hatırlatıcıları görebilirsiniz."
     ];
     const androidSteps = [
