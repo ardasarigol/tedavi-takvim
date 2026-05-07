@@ -182,7 +182,7 @@
   }
 
   .reminder-info { flex: 1; }
-  .reminder-name { font-size: 1rem; font-weight: 500; color: var(--text); }
+  .reminder-name { font-size: 0.9rem; font-weight: 500; color: var(--text); }
   .reminder-date { font-size: 0.875rem; color: var(--muted); margin-top: 2px; }
 
   .btn {
@@ -285,7 +285,7 @@
 
   <div class="onboarding">
     <div style="font-size:22px;flex-shrink:0;margin-top:1px;">📅</div>
-    <p>Tedavi takviminizi oluşturmak için lütfen hasta tipinizi seçin.</p>
+    <p>Sedef Hastalığı tedavi takviminizi oluşturmak için lütfen hasta tipinizi seçin.</p>
   </div>
 
   <div class="patient-select">
@@ -364,20 +364,26 @@
     computed = [];
 
     if (type === "naive") {
+      // Naif: 1.doz bugün, 2.doz 28 gün, 3.doz 2.dozdan 3ay, 4.doz 3.dozdan 3ay
       const dose2 = addDays(today, 28);
       const dose3 = addMonths(dose2, 3);
       const dose4 = addMonths(dose3, 3);
       computed = [
-        { label: "2. Doz", badge: "2.\nDoz", date: dose2 },
-        { label: "3. Doz", badge: "3.\nDoz", date: dose3 },
-        { label: "4. Doz", badge: "4.\nDoz", date: dose4 },
+        { label: "Sedef Hastalığı Tedavinizin 2. Dozu", badge: "2.\nDoz", date: dose2 },
+        { label: "Sedef Hastalığı Tedavinizin 3. Dozu", badge: "3.\nDoz", date: dose3 },
+        { label: "Sedef Hastalığı Tedavinizin 4. Dozu", badge: "4.\nDoz", date: dose4 },
       ];
       document.getElementById("startLabel").textContent = "1. Doz — Başlangıç tarihi";
     } else {
-      const nextDose = addMonths(today, 3);
-      computed = [
-        { label: "Sonraki Dozunuz", badge: "Sonr.\nDoz", date: nextDose },
-      ];
+      // Devamlı: bugünden itibaren 3 ayda bir, 2 yıl boyunca = 8 doz
+      for (let i = 1; i <= 8; i++) {
+        const doseDate = addMonths(today, i * 3);
+        computed.push({
+          label: "Sedef Hastalığı Tedavinizin Sonraki " + i + ". Dozu",
+          badge: i + ".\nDoz",
+          date: doseDate
+        });
+      }
       document.getElementById("startLabel").textContent = "Bugünkü Doz tarihi";
     }
 
@@ -417,12 +423,13 @@
     let ics = "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//TedaviTakip//TR\r\nCALSCALE:GREGORIAN\r\n";
 
     computed.forEach((r, i) => {
+      // 5 günlük geri sayım etkinlikleri
       for (let daysLeft = 5; daysLeft >= 1; daysLeft--) {
         const alertDate = addDays(r.date, -daysLeft);
         const uid = "tedavi-" + i + "-countdown-" + daysLeft + "-" + Date.now() + "@tedavitakip";
         const dtstart = toICSDate(alertDate);
         const title = daysLeft === 1
-          ? "⚠️ Yarın " + r.label + " — Kliniğinizi arayın!"
+          ? "⚠️ Yarın — " + r.label + " için kliniğinizi arayın!"
           : "📅 " + r.label + " için " + daysLeft + " gün kaldı";
         const desc = daysLeft === 1
           ? r.label + " için yarın kliniğinize başvurunuz, ihmal etmeyin!"
@@ -438,6 +445,7 @@
         ics += "END:VEVENT\r\n";
       }
 
+      // Doz günü etkinliği
       const doseUid = "tedavi-" + i + "-doseday-" + Date.now() + "@tedavitakip";
       const doseDt = toICSDate(r.date);
       const doseDesc = "Bugün " + r.label + " günüdür. Lütfen kliniğinize başvurunuz.";
@@ -445,7 +453,7 @@
       ics += "UID:" + doseUid + "\r\n";
       ics += "DTSTART;VALUE=DATE:" + doseDt + "\r\n";
       ics += "DTEND;VALUE=DATE:" + doseDt + "\r\n";
-      ics += "SUMMARY:💉 " + r.label + " — Klinik Randevusu\r\n";
+      ics += "SUMMARY:💉 " + r.label + "\r\n";
       ics += "DESCRIPTION:" + doseDesc + "\r\n";
       ics += "BEGIN:VALARM\r\nTRIGGER:-PT0S\r\nACTION:DISPLAY\r\nDESCRIPTION:" + doseDesc + "\r\nEND:VALARM\r\n";
       ics += "END:VEVENT\r\n";
