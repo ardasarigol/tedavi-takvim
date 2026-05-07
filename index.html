@@ -5,7 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Tedavi Takip — Hatırlatıcı Ekle</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-D8N0C9ZEYF"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-D8N0C9ZEYF');
+</script>
+
+<!-- Counter.dev -->
 <script src="https://cdn.counter.dev/script.js" data-id="4a6257ec-ae02-433f-9c55-313493224cad" data-utcoffset="3"></script>
+
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -360,11 +372,15 @@
     document.getElementById("btn-naive").classList.toggle("selected", type === "naive");
     document.getElementById("btn-continuing").classList.toggle("selected", type === "continuing");
 
+    // Google Analytics event — hasta tipi seçildi
+    gtag('event', 'hasta_tipi_secildi', {
+      'hasta_tipi': type === 'naive' ? 'Naif Hasta' : 'Devamli Hasta'
+    });
+
     const today = new Date();
     computed = [];
 
     if (type === "naive") {
-      // Naif: 1.doz bugün, 2.doz 28 gün, 3.doz 2.dozdan 3ay, 4.doz 3.dozdan 3ay
       const dose2 = addDays(today, 28);
       const dose3 = addMonths(dose2, 3);
       const dose4 = addMonths(dose3, 3);
@@ -375,7 +391,6 @@
       ];
       document.getElementById("startLabel").textContent = "1. Doz — Başlangıç tarihi";
     } else {
-      // Devamlı: bugünden itibaren 3 ayda bir, 2 yıl boyunca = 8 doz
       for (let i = 1; i <= 8; i++) {
         const doseDate = addMonths(today, i * 3);
         computed.push({
@@ -423,7 +438,6 @@
     let ics = "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//TedaviTakip//TR\r\nCALSCALE:GREGORIAN\r\n";
 
     computed.forEach((r, i) => {
-      // 5 günlük geri sayım etkinlikleri
       for (let daysLeft = 5; daysLeft >= 1; daysLeft--) {
         const alertDate = addDays(r.date, -daysLeft);
         const uid = "tedavi-" + i + "-countdown-" + daysLeft + "-" + Date.now() + "@tedavitakip";
@@ -445,7 +459,6 @@
         ics += "END:VEVENT\r\n";
       }
 
-      // Doz günü etkinliği
       const doseUid = "tedavi-" + i + "-doseday-" + Date.now() + "@tedavitakip";
       const doseDt = toICSDate(r.date);
       const doseDesc = "Bugün " + r.label + " günüdür. Lütfen kliniğinize başvurunuz.";
@@ -468,6 +481,11 @@
     a.download = "tedavi-takvim.ics";
     a.click();
     URL.revokeObjectURL(url);
+
+    // Google Analytics event — takvime eklendi
+    gtag('event', 'takvime_eklendi', {
+      'hasta_tipi': computed[0].label.includes('Sonraki') ? 'Devamli Hasta' : 'Naif Hasta'
+    });
 
     const btn = document.getElementById("downloadBtn");
     btn.classList.add("success");
