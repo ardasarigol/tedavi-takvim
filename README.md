@@ -28,4 +28,6 @@ HTML · CSS · Vanilla JavaScript · iCalendar (.ics) · Google Analytics
 ## 🚀 Kullanım
 
 Projeyi klonlayın ve `index.html` dosyasını tarayıcıda açın.
-Veya: [Canlı Demo](#) *(link eklenecek)*
+Veya: ## 🚀 Kullanım
+
+[🔗 Canlı Demo](https://ardasarigol.github.io/tedavi-takvim/)
